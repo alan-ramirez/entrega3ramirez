@@ -1,6 +1,6 @@
 //importar nuestras dependencias 
-import express from "express"
-import { productManager } from "./productManager.js"
+import express from "express";
+import { productManager } from "./productManager.js";
 
 //instanciar nuestras constantes
 const app = express()
@@ -12,6 +12,7 @@ app.use(express.urlencoded({extended:true}))
 app.get('/products', (req,res)=>{
   const {limit} = req.query
   productManager.getProducts().then((products)=>{
+
     if(products.length===0) return res.send('No se encontraron productos')
     if(limit){
       return res.send(products.slice(0,limit))

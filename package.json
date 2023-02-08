@@ -6,7 +6,7 @@
     "uuid": "^9.0.0"
   },
   "type": "module",
-  "name": "entregable3ramirez",
+  "name": "y",
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
@@ -16,5 +16,13 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/alan-ramirez/entrega3ramirez.git"
+  },
+  "bugs": {
+    "url": "https://github.com/alan-ramirez/entrega3ramirez/issues"
+  },
+  "homepage": "https://github.com/alan-ramirez/entrega3ramirez#readme",
   "description": ""
 }

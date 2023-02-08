@@ -8,20 +8,24 @@ class ProductManager {
     this.path = path
   }
   //Verifico que el archivo de productos exista
-  checkProduct(){
+  async checkProduct(){
     if(fs.existsSync(this.path)){
-      this.products = JSON.parse(fs.readFileSync(this.path))
+      this.products = JSON.parse(await fs.promises.readFile(this.path))
     }
   }
+  //Metodo updateProducts para actualizar los productos
+  async updateProducts(){
+    await fs.promises.writeFile(this.path, JSON.stringify(this.products))
+  }
   //Método addProduct, que recibe un objeto con el formato previamente especificado, le asigna una id autoincrementable (en este caso utilizando uuidv4) y lo guarda
-  addProduct(title, description, price, thumbnail, code, stock) {
-    this.checkProduct()
+  async addProduct(title, description, price, thumbnail, code, stock){
+    await this.checkProduct()
 
     //Verifico si el producto se encuentra en el array products
-    const inProducts = this.products.some(product => product.code===code)
+    const inProducts = this.products.some(product => product.code === code)
 
     //Condición para agregar un producto con todas las características necesarias
-    if (inProducts === false&&title&&description&&price&&thumbnail&&stock) {
+    if(inProducts === false && title && description && price && thumbnail && stock){
       this.products.push({
         id: uuidv4(),
         title: title,
@@ -31,37 +35,36 @@ class ProductManager {
         code: code,
         stock: stock
       })
-
-      fs.writeFileSync(this.path, JSON.stringify(this.products))
+      this.updateProducts
       return "El producto fue agregado con éxito"
-    //Condición en caso de repetición o falta de características
-    } else {
+      //Condición en caso de repetición o falta de características
+    }else{
       return "El producto está repetido o faltan características"
     }
   }
 
-  //método getProducts, que lee el archivo de productos y devuelve todos los productos en formato de array (array products)
-  getProducts() {
+  //método getProducts, que lee el archivo de productos y devuelve todos los productos en formato de array (array products) 
+  async getProducts(){
+    await this.checkProduct()
     return this.products
   }
 
   //método getProductById, que recibe un id y luego de leer el archivo busca el producto con el id especificado y lo devuelve en formato objeto
-  getProductById(id){
-
-    this.checkProduct()
-    const productIsFound = this.products.find(product => product.id === id)
-    if (productIsFound){
-      return productIsFound
+  async getProductById(id){
+    await this.checkProduct()
+    const productFound = this.products.find(product => product.id === id)
+    if (productFound){
+      return productFound
     }else{
       return "Producto no encontrado"
     }
   }
 
   //método updateProduct, el cual recibe el id  y el campo del producto a actualizar (puede ser el objeto completo) y actualiza el producto que tenga ese id en el archivo
-  updateProduct(id, title, description, price, thumbnail, code, stock){
-    this.checkProduct()
+  async updateProduct(id, title, description, price, thumbnail, code, stock){
+    await this.checkProduct()
     const idFound = this.products.findIndex(product => product.id === id)
-    if(idFound !== -1) {
+    if(idFound !== -1){
       this.products[idFound] = {
         id: id,
         title: title,
@@ -71,7 +74,7 @@ class ProductManager {
         code: code,
         stock: stock
       }
-      fs.writeFileSync(this.path, JSON.stringify(this.products))
+      await this.updateProducts()
       return "El producto fue actualizado exitosamente"
     }else{
       return "Producto no encontrado"
@@ -79,20 +82,19 @@ class ProductManager {
   }
 
   //método deleteProduct, que recibe un id y elimina el producto que tenga ese id en el archivo
-  deleteProduct(id){
-    this.checkProduct()
+  async deleteProduct(id){
+    await this.checkProduct()
     const indexFound = this.products.findIndex(product => product.id === id)
-
     if(indexFound !== -1){
-      this.products.splice(indexFound, indexFound+1)
-      fs.writeFileSync(this.path, JSON.stringify(this.products))
+      this.products.splice(indexFound,indexFound+1)
+      await this.updateProducts()
       return "El producto fue eliminado exitosamente"
     }else{
       return "Producto no encontrado"
     }
   }
 }
-export const productManager = new ProductManager("./src/products.json")
+export const productManager = new ProductManager("./products.json")
 
 // const productManager = new ProductManager("./products.json")
 // console.log(productManager.getProducts())
@@ -113,4 +115,3 @@ export const productManager = new ProductManager("./src/products.json")
 
 //Test de eliminación de producto. Remover comentario
 // console.log(productManager.deleteProduct("579bd56b-e860-48b0-8205-9135ac6e7799"))
-
